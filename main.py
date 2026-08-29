@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Query, Path
 
 ## initialisation de l'app
 app = FastAPI()
@@ -23,14 +23,28 @@ def path_test(path_id):
     }
 
 @app.get("/users/{user_id}")
-def get_user(user_id: int):
+def get_user(user_id: int = Path(ge=1)):
     return {
         "user_id": user_id,
         "message": "Utilisateur trouvé"
     }
 
 @app.get("/products/{product_id}")
-def get_product(product_id: int):
+def get_product(product_id: int = Path(ge=1)):
     return {
         "product_id": product_id
+    }
+
+@app.get("/users")
+def get_users(page: int = Query(default=1, ge=1), limit: int = Query(default=10, ge=1, le=50)):
+    return {
+        "limit": limit,
+        "page": page
+    }
+    
+@app.get("/products")
+def get_products(page: int = Query(default=1, ge=1), limit: int = Query(default=10, ge=1, le=50)):
+    return {
+        "limit": limit,
+        "page": page
     }
