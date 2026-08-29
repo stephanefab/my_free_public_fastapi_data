@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Query, Path
+from fastapi import FastAPI, Query, Path, Header
 
 ## initialisation de l'app
 app = FastAPI()
@@ -47,4 +47,10 @@ def get_products(page: int = Query(default=1, ge=1), limit: int = Query(default=
     return {
         "limit": limit,
         "page": page
+    }
+
+@app.get("/headers")
+def get_headers(x_client_name: str = Header(default="")):
+    return {
+        "client": x_client_name
     }
