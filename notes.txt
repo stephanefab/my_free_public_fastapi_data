@@ -1,0 +1,251 @@
+# python -m venv venv
+# venv\Scripts\activate
+# pip install fastapi uvicorn
+# pip show fastapi
+# pip show uvicorn
+-------
+# uvicorn main:app --reload
+# uvicorn main:app --host 0.0.0.0 --port 5000  --workers 2 
+# uvicorn main:app --host 0.0.0.0 --port 5000  --reload
+# uvicorn main:app --env-file .env
+-------
+Client
+   │
+   │ GET /about
+   ▼
+Uvicorn
+   │
+   │ transmet la requête à l'application
+   ▼
+FastAPI
+   │
+   │ cherche une route correspondant à
+   │ GET + /about
+   ▼
+@app.get("/about")
+def about():
+   │
+   │ exécution
+   ▼
+Python dict
+   │
+   │ {"name": ..., "age": ..., "job": ...}
+   ▼
+FastAPI
+   │
+   │ sérialisation
+   ▼
+Réponse HTTP JSON
+   │
+   ▼
+Client
+---------------
+# Query & Path
+Si la valeur sert à identifier directement une ressource, on utilise généralement le Path. Si elle sert à filtrer, rechercher, trier ou contrôler la manière dont on récupère une collection, on utilise généralement Query.
+---------------
+# Header
+Un header est une information supplémentaire envoyée avec la requête HTTP
+
+* Accept
+Indique au serveur quel type de réponse le client souhaite.
+-> Accept: application/json
+
+* Content-Type
+Indique le format des données envoyées dans le body.
+-> Content-Type: application/json
+
+* Authorization
+Sert généralement à transmettre des informations d'authentification.
+-> Authorization: Bearer eyJhbGciOi...
+
+* User-Agent
+Permet généralement d'indiquer quel client effectue la requête
+-> User-Agent: Mozilla/5.0
+--> user_agent: str = Header() # forcer le header
+--> user_agent: str | None = Header(default=None) # le header peut être nul
+--> user_agent: str | None = Header(default=None, alias="User-Agent")
+-----------------
+# le Body avec pydantic
+Client
+  │
+  │ JSON
+  ▼
+FastAPI
+  │
+  ▼
+Pydantic
+  │
+  │ validation
+  ▼
+UserCreate
+  │
+  ▼
+create_user(user)
+  │
+  ▼
+réponse JSON
+-------------------
+                 REQUÊTE HTTP
+                      │
+       ┌──────────────┼──────────────┐
+       │              │              │
+      Path           Query         Header
+       │              │              │
+       ▼              ▼              ▼
+ /users/25     ?limit=10       X-Client: App
+       │              │              │
+       └──────────────┼──────────────┘
+                      │
+                      ▼
+                    FastAPI
+                      │
+                      ▼
+                    Body
+                      │
+                      ▼
+             Pydantic BaseModel
+----------------
+# les erreurs 422
+type
+ ↓
+nature du problème
+
+loc
+ ↓
+où est le problème ?
+
+msg
+ ↓
+explication humaine
+
+input
+ ↓
+valeur reçue
+--------------------------
+                    CLIENT
+                       │
+                       │ HTTP
+                       ▼
+                 ┌───────────┐
+                 │  Uvicorn  │
+                 └─────┬─────┘
+                       │
+                       ▼
+                 ┌───────────┐
+                 │  FastAPI  │
+                 └─────┬─────┘
+                       │
+          ┌────────────┼────────────┐
+          │            │            │
+        Path         Query        Header
+          │            │            │
+          └────────────┼────────────┘
+                       │
+                      Body
+                       │
+                       ▼
+                   Pydantic
+                       │
+                  validation
+                       │
+                ┌──────┴──────┐
+                │             │
+                ❌             ✅
+                │             │
+               422          fonction
+                              │
+                              ▼
+                         réponse JSON
+----------------------
+                    CLIENT
+                       │
+                       │ HTTP Request
+                       ▼
+              ┌─────────────────┐
+              │     FastAPI     │
+              └─────────────────┘
+                       │
+        ┌──────────────┼──────────────┐
+        ▼              ▼              ▼
+      Path           Query          Header
+        │              │              │
+        └──────────────┼──────────────┘
+                       │
+                       ▼
+                  Request Body
+                       │
+                       ▼
+                Pydantic Model
+                       │
+                       ▼
+                  Validation
+                       │
+                       ▼
+                 Application
+                       │
+                       ▼
+                Response Model
+                       │
+                       ▼
+                  HTTP Response
+---------------------
+HTTP Request
+     ↓
+Routing
+     ↓
+Path / Query / Headers
+     ↓
+Body
+     ↓
+Pydantic validation
+     ↓
+Endpoint
+     ↓
+Business logic
+     ↓
+Response model
+     ↓
+Serialization
+     ↓
+HTTP Response
+---------------------
+Client
+  │
+  │ HTTP POST
+  ▼
+┌───────────────────┐
+│      FastAPI      │
+└─────────┬─────────┘
+          │
+          ▼
+       Routing
+          │
+          ▼
+   Extraction des paramètres
+   ├── Path
+   ├── Query
+   ├── Headers
+   └── Body
+          │
+          ▼
+    Pydantic Validation
+          │
+     ┌────┴────┐
+     │         │
+   valide    invalide
+     │         │
+     ▼         ▼
+ Endpoint     422
+     │
+     ▼
+Business Logic
+     │
+     ▼
+Response Model
+     │
+     ▼
+Serialization
+     │
+     ▼
+HTTP Response
+--------------------
