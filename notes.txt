@@ -249,3 +249,35 @@ Serialization
      ▼
 HTTP Response
 --------------------
+CLIENT
+  │
+  │ JSON
+  ▼
+FASTAPI
+  │
+  │ validation
+  ▼
+PYTHON
+  │
+  │ logique métier
+  ▼
+PYTHON
+  │
+  │ serialization
+  ▼
+JSON
+  │
+  ▼
+CLIENT
+-------------------------
+1. ROUTING
+   ↓
+   Est-ce que la requête correspond à une route ?
+
+2. VALIDATION
+   ↓
+   Les données respectent-elles les types/règles ?
+
+3. LOGIQUE MÉTIER
+   ↓
+   La demande est-elle autorisée/possible ?

@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, Header, Query
 from pydantic import BaseModel
 
 app = FastAPI()
