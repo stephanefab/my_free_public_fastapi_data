@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Path, HTTPException, Header, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator, model_validator, Field
 
 app = FastAPI()
 
@@ -13,10 +13,31 @@ next_product_id = 4
 
 
 class ProductCreate(BaseModel):
-    name: str
-    price: float
-    quantity: int
+    name: str = Field(min_length=2)
+    price: float = Field(ge=0)
+    quantity: int = Field(ge=0)
 
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, value):
+        value = value.strip()
+
+        if not value:
+            raise ValueError(
+                "Le nom ne peut pas contenir uniquement des espaces"
+            )
+
+        return value.lower()
+
+    @model_validator(mode="after")
+    def validate_product(self):
+        if self.price == 0 and self.quantity == 0:
+            raise ValueError(
+                "Un produit gratuit doit avoir une quantité supérieure à 0"
+            )
+        
+        return self
+    
 class ProductUpdate(BaseModel):
     name: str
     price: float
@@ -94,7 +115,7 @@ def update_product(product_update: ProductUpdate, product_id: int = Path(ge=1)):
 
 
 @app.patch("/products/{product_id}", status_code=200)
-def patch_product(product_upatch: ProductPatch, product_id: int = Path(ge=1)):
+def patch_product(product_patch: ProductPatch, product_id: int = Path(ge=1)):
     product = find_product(product_id)
         
     if product is None:
@@ -103,7 +124,7 @@ def patch_product(product_upatch: ProductPatch, product_id: int = Path(ge=1)):
             detail="Produit introuvable"
         )
     
-    updates = product_upatch.model_dump(exclude_unset=True)
+    updates = product_patch.model_dump(exclude_unset=True)
     
     for field, value in updates.items():
         product[field] = value

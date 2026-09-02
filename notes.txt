@@ -324,3 +324,19 @@ champ = ""
 model_fields_set contient le champ
 et sa valeur est ""
 ----------------------
+mode="before"
+
+donnée brute
+    ↓
+ton validator
+    ↓
+Pydantic valide/convertit
+----------------
+mode="after"
+
+donnée brute
+    ↓
+Pydantic valide/convertit
+    ↓
+ton validator
+----------
