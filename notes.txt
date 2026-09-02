@@ -1,13 +1,10 @@
-# python -m venv venv
-# venv\Scripts\activate
-# pip install fastapi uvicorn
-# pip show fastapi
-# pip show uvicorn
+# uv init
+# uv add fastapi uvicorn
 -------
-# uvicorn main:app --reload
-# uvicorn main:app --host 0.0.0.0 --port 5000  --workers 2 
-# uvicorn main:app --host 0.0.0.0 --port 5000  --reload
-# uvicorn main:app --env-file .env
+# uv run uvicorn main:app --reload
+# uv run uvicorn main:app --host 0.0.0.0 --port 5000  --workers 2 
+# uv run uvicorn main:app --host 0.0.0.0 --port 5000  --reload
+# uv run uvicorn main:app --env-file .env
 -------
 Client
    │
@@ -281,3 +278,49 @@ CLIENT
 3. LOGIQUE MÉTIER
    ↓
    La demande est-elle autorisée/possible ?
+-------------------------------------------
+                Produit
+                   │
+       ┌───────────┼────────────┐
+       ↓           ↓            ↓
+   Création      Mise à jour   Réponse
+       │           │            │
+ ProductCreate ProductUpdate ProductResponse
+ ProductPatch -> Mise à jour partielle
+-------------------------------------------
+Le Response Model doit contenir exactement les données que le contrat public de l'API autorise à exposer.
+--------
+Deux modèles peuvent avoir actuellement les mêmes champs tout en représentant deux contrats différents.
+--------
+Pour Patch
+class ProductPatch(BaseModel):
+    name: str | None = None
+    price: float | None = None
+    quantity: int | None = None
+
+product = find_product(1)
+product_patch: ProductPatch
+product_path_data = product_patch.model_dump(exclude_unset=True)
+for field, value in product_path_data.items():
+     product[field] = value
+----------
+exclude_unset → "Est-ce que le client a envoyé ce champ ?"
+exclude_none  → "Est-ce que la valeur de ce champ est None ?"
+-----------
+0, "", False et [] ne sont pas None
+----------
+product_path_data.model_fields_set
+champ absent
+        ↓
+model_fields_set ne contient pas le champ
+
+champ = null
+        ↓
+model_fields_set contient le champ
+mais sa valeur est None
+
+champ = ""
+        ↓
+model_fields_set contient le champ
+et sa valeur est ""
+----------------------
