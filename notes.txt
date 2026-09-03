@@ -385,3 +385,33 @@ model_validator(after)
      ▼
 Objet Pydantic valide
 -------
+Field
+│
+├── quantity >= 1
+├── price >= 0
+└── name min_length=2
+│
+↓
+Contraintes individuelles
+
+
+field_validator
+│
+├── nettoyer un nom
+├── normaliser un email
+└── règle particulière sur UN champ
+│
+↓
+Logique d'un champ
+
+
+model_validator
+│
+├── quantity ↔ price
+├── password ↔ password_confirmation
+├── start_date ↔ end_date
+└── autres invariants
+│
+↓
+Cohérence entre plusieurs champs
+----------------
