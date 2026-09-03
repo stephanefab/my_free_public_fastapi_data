@@ -340,3 +340,48 @@ Pydantic valide/convertit
     ↓
 ton validator
 ----------
+                 UserCreate
+                     │
+        ┌────────────┴────────────┐
+        ↓                         ↓
+ username/email              password...
+        ↓                         ↓
+    before                    Field
+        ↓
+     strip()
+        ↓
+      Field
+        ↓
+  min_length
+        │
+        └────────────┬────────────
+                     ↓
+             modèle construit
+                     ↓
+          model_validator(after)
+                     ↓
+       password == confirmation ?
+                     ↓
+                   OK
+-------------------
+Données brutes
+     │
+     ▼
+model_validator(before)
+     │
+     ▼
+Validation de chaque champ
+     │
+     ├── type
+     ├── Field(...)
+     └── field_validator(before/after)
+     │
+     ▼
+Modèle construit
+     │
+     ▼
+model_validator(after)
+     │
+     ▼
+Objet Pydantic valide
+-------
