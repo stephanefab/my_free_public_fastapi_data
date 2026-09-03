@@ -415,3 +415,79 @@ model_validator
 ↓
 Cohérence entre plusieurs champs
 ----------------
+créer un type réutilisable avec Annotated
+from typing import Annotated
+Name = Annotated[str, Field(min_length=2, max_length=100)]
+class ProductCreate(BaseModel):
+    name: Name
+    price: float
+
+class UserCreate(BaseModel):
+    username: Name
+
+Name
+ │
+ ├── type réel : str
+ │
+ └── contraintes Pydantic :
+       min_length=2
+       max_length=100
+-----------
+from typing import Annotated
+from pydantic import BaseModel, Field
+
+class OldProductCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=100)
+    price: float = Field(ge=0)
+    quantity: int = Field(ge=0)
+
+ProductName = Annotated[
+    str,
+    Field(min_length=2, max_length=100)
+]
+
+PositivePrice = Annotated[
+    float,
+    Field(ge=0)
+]
+
+PositiveQuantity = Annotated[
+    int,
+    Field(ge=0)
+]
+
+class ProductCreate(BaseModel):
+    name: ProductName
+    price: PositivePrice
+    quantity: PositiveQuantity
+
+
+class ProductPatch(BaseModel):
+    name: ProductName | None = None
+    price: PositivePrice | None = None
+    quantity: PositiveQuantity | None = None
+-------------------
+app/
+│
+├── main.py
+│
+├── schemas/
+│   ├── __init__.py
+│   ├── user.py
+│   ├── product.py
+│   └── order.py
+│
+├── routes/
+│   ├── users.py
+│   ├── products.py
+│   └── orders.py
+│
+├── services/
+│   ├── user_service.py
+│   ├── product_service.py
+│   └── order_service.py
+│
+└── models/
+    ├── user.py
+    ├── product.py
+    └── order.py
