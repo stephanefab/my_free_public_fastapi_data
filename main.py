@@ -92,15 +92,23 @@ def find_user(user_id: int):
             return user
     return None
 
-def filter_users_by_role(role: str | None = None):
+def filter_users_by_role(users: list, role: str | None = None):
     if role is None:
         return users.copy()
     
     return [user for user in users if user["role"] == role]
+
+def search_users(users: list, search: str | None = None):
+    if search is None:
+        return users.copy()
+    
+    search = search.lower()
+    return [user for user in users if (search in user["email"] or search in user["username"])]
     
 @app.get("/users", response_model=list[UserResponse])
-def get_users(role: str | None = Query(default=None)):
-    return filter_users_by_role(role)
+def get_users(role: str | None = Query(default=None), search: str | None = Query(default=None)):
+    user_by_role = filter_users_by_role(users, role)
+    return search_users(user_by_role, search)
 
 @app.get("/users/{user_id}", response_model=UserResponse)
 def get_user(user_id: int = Path(ge=1)):
