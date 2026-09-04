@@ -491,3 +491,14 @@ app/
     ├── user.py
     ├── product.py
     └── order.py
+--------------------------
+* pagination:
+# offset + limit = mécanique
+offset → combien je saute
+limit  → combien je prends
+page = (offset // limit) + 1
+--
+# page + page_size = abstraction
+offset = (page - 1) * page_size
+limit = page_size
+--------------------------

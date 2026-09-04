@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Path, HTTPException, Query
 from schemas.product import ProductCreate, ProductUpdate, ProductPatch, ProductResponse
-from schemas.user import UserCreate, UserUpdate, UserPatch, UserResponse
+from schemas.user import UserCreate, UserUpdate, UserPatch, UserResponse, UserListResponse
 from datas import products, next_product_id, users, next_user_id
 from datetime import datetime
 
@@ -96,19 +96,49 @@ def filter_users_by_role(users: list, role: str | None = None):
     if role is None:
         return users.copy()
     
+    role = role.strip().lower()
     return [user for user in users if user["role"] == role]
 
 def search_users(users: list, search: str | None = None):
     if search is None:
         return users.copy()
     
-    search = search.lower()
+    search = search.strip().lower()
     return [user for user in users if (search in user["email"].lower() or search in user["username"].lower())]
+
+def paginate_users(users: list, limit: int = 20, offset: int = 0):    
+    end = offset + limit
+    return users[offset:end]
     
-@app.get("/users", response_model=list[UserResponse])
-def get_users(role: str | None = Query(default=None), search: str | None = Query(default=None)):
-    user_by_role = filter_users_by_role(users, role)
-    return search_users(user_by_role, search)
+@app.get("/users", response_model=UserListResponse)
+def get_users(role: str | None = Query(default=None), search: str | None = Query(default=None), limit: int = Query(default=20, gt=0, le=100), offset: int = Query(default=0, ge=0)):
+    filtered_users = filter_users_by_role(users, role)
+    filtered_users = search_users(filtered_users, search)
+
+    total = len(filtered_users)
+    items = paginate_users(filtered_users, limit, offset)
+    
+    total = len(filtered_users)
+    has_next = total > offset + limit
+    has_previous = offset > 0
+    
+    if has_previous:
+        previous_offset = offset - limit
+    else:
+        previous_offset = 0
+        
+    if has_next:
+        next_offset = offset + limit
+    else:
+        next_offset = 0
+    
+    items = paginate_users(filtered_users, limit, offset)
+    return {
+        "items": items,
+        "total": total,
+        "limit": limit,
+        "offset": offset,
+    }
 
 @app.get("/users/{user_id}", response_model=UserResponse)
 def get_user(user_id: int = Path(ge=1)):
@@ -203,4 +233,3 @@ def delete_user(user_id: int = Path(ge=1)):
             )
     
     users.remove(user)
-    
