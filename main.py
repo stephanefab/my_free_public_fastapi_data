@@ -92,16 +92,15 @@ def find_user(user_id: int):
             return user
     return None
 
-def add_filter(role: str = "user"):
-    datas = []
-    for user in users:
-        if user["role"] == role:
-            datas.append(user)
-    return datas
+def filter_users_by_role(role: str | None = None):
+    if role is None:
+        return users.copy()
+    
+    return [user for user in users if user["role"] == role]
     
 @app.get("/users", response_model=list[UserResponse])
-def get_users(role: str = Query(default="user")):
-    return add_filter(role)
+def get_users(role: str | None = Query(default=None)):
+    return filter_users_by_role(role)
 
 @app.get("/users/{user_id}", response_model=UserResponse)
 def get_user(user_id: int = Path(ge=1)):
