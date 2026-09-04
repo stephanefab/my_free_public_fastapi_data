@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Path, HTTPException
+from fastapi import FastAPI, Path, HTTPException, Query
 from schemas.product import ProductCreate, ProductUpdate, ProductPatch, ProductResponse
 from schemas.user import UserCreate, UserUpdate, UserPatch, UserResponse
 from datas import products, next_product_id, users, next_user_id
@@ -30,6 +30,10 @@ def find_product(product_id: int):
         if p['id'] == product_id:
             return p
     return None
+
+@app.get("/products", response_model=list[ProductResponse])
+def get_products():
+    return products
 
 @app.get("/products/{product_id}", response_model=ProductResponse)
 def get_product(product_id: int = Path(ge=1)):
@@ -69,11 +73,44 @@ def patch_product(product_patch: ProductPatch, product_id: int = Path(ge=1)):
     
     return product
 
+@app.delete("/products/{product_id}", status_code=204)
+def delete_product(product_id: int = Path(ge=1)):
+    product = find_product(product_id)
+    
+    if product is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Le produit #{product_id} n'a pas été trouvé"
+            )
+    
+    products.remove(product)
+    
+
 def find_user(user_id: int):
     for user in users:
         if user["id"] == user_id:
             return user
     return None
+
+def add_filter(role: str = "user"):
+    datas = []
+    for user in users:
+        if user["role"] == role:
+            datas.append(user)
+    return datas
+    
+@app.get("/users", response_model=list[UserResponse])
+def get_users(role: str = Query(default="user")):
+    return add_filter(role)
+
+@app.get("/users/{user_id}", response_model=UserResponse)
+def get_user(user_id: int = Path(ge=1)):
+    user = find_user(user_id)
+    
+    if user is None:
+        raise HTTPException(status_code=404, detail=f"l'utilisateur #{user_id} n'a pas été trouvé")
+    
+    return user
 
 @app.post(
     "/users",
@@ -147,3 +184,16 @@ def patch_user(
         user["updated_at"] = datetime.now()
 
     return user
+
+@app.delete("/users/{user_id}", status_code=204)
+def delete_user(user_id: int = Path(ge=1)):
+    user = find_user(user_id)
+    
+    if user is None:
+            raise HTTPException(
+                status_code=404,
+                detail=f"L'utilisateur #{user_id} n'a pas été trouvé"
+            )
+    
+    users.remove(user)
+    
