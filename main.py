@@ -103,7 +103,7 @@ def search_users(users: list, search: str | None = None):
         return users.copy()
     
     search = search.lower()
-    return [user for user in users if (search in user["email"] or search in user["username"])]
+    return [user for user in users if (search in user["email"].lower() or search in user["username"].lower())]
     
 @app.get("/users", response_model=list[UserResponse])
 def get_users(role: str | None = Query(default=None), search: str | None = Query(default=None)):
