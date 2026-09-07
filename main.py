@@ -3,6 +3,7 @@ from schemas.product import ProductCreate, ProductUpdate, ProductPatch, ProductR
 from schemas.user import UserCreate, UserUpdate, UserPatch, UserResponse, UserListResponse
 from datas import products, next_product_id, users, next_user_id
 from datetime import datetime
+import math
 
 app = FastAPI()
 
@@ -111,33 +112,28 @@ def paginate_users(users: list, limit: int = 20, offset: int = 0):
     return users[offset:end]
     
 @app.get("/users", response_model=UserListResponse)
-def get_users(role: str | None = Query(default=None), search: str | None = Query(default=None), limit: int = Query(default=20, gt=0, le=100), offset: int = Query(default=0, ge=0)):
+def get_users(role: str | None = Query(default=None), search: str | None = Query(default=None), page: int = Query(default=1, ge=1), page_size: int = Query(default=20, ge=1, le=100)):
     filtered_users = filter_users_by_role(users, role)
     filtered_users = search_users(filtered_users, search)
 
     total = len(filtered_users)
-    items = paginate_users(filtered_users, limit, offset)
     
-    total = len(filtered_users)
-    has_next = total > offset + limit
-    has_previous = offset > 0
+    offset = (page - 1) * page_size
+    items = paginate_users(filtered_users, page_size, offset)
     
-    if has_previous:
-        previous_offset = offset - limit
-    else:
-        previous_offset = 0
-        
-    if has_next:
-        next_offset = offset + limit
-    else:
-        next_offset = 0
+    total_pages = math.ceil(total/page_size)
     
-    items = paginate_users(filtered_users, limit, offset)
+    has_next = page < total_pages
+    has_previous = page > 1
+    
     return {
         "items": items,
         "total": total,
-        "limit": limit,
-        "offset": offset,
+        "total_pages": total_pages,
+        "page": page,
+        "page_size": page_size,
+        "has_previous": has_previous,
+        "has_next": has_next
     }
 
 @app.get("/users/{user_id}", response_model=UserResponse)

@@ -45,5 +45,8 @@ class UserResponse(BaseModel):
 class UserListResponse(BaseModel):
     items: list[UserResponse]
     total: int
-    limit: int
-    offset: int
+    total_pages: int
+    page: int
+    page_size: int
+    has_previous: bool
+    has_next: bool

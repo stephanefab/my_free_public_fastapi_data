@@ -502,3 +502,31 @@ page = (offset // limit) + 1
 offset = (page - 1) * page_size
 limit = page_size
 --------------------------
+total_in_db = 73
+page = 3
+page_size = 20
+
+* offset
+offset = (page - 1) * page_size
+       = (3 - 1) * 20
+       = 40
+--> offset = 40
+
+* total_pages
+total_in_db/page_size
+73 éléments
+20 éléments/page
+73/20 = 3,65 => 4
+--> total_pages = 4
+Page 1 → 1 à 20
+Page 2 → 21 à 40
+Page 3 → 41 à 60
+Page 4 → 61 à 73
+
+* has_next
+page = 3
+total_pages = 4
+has_next = page < total_pages
+
+* has_previous
+has_previous = page > 1
