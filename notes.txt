@@ -530,3 +530,4 @@ has_next = page < total_pages
 
 * has_previous
 has_previous = page > 1
+------------------

@@ -105,10 +105,25 @@ def search_users(users: list, search: str | None = None):
         return users.copy()
     
     search = search.strip().lower()
+    if search == "":
+        return users.copy()
+    
     return [user for user in users if (search in user["email"].lower() or search in user["username"].lower())]
 
-def paginate_users(users: list, limit: int = 20, offset: int = 0):    
-    end = offset + limit
+def paginate_users(
+    users: list,
+    page: int = 1,
+    page_size: int = 20
+):
+    if page < 1:
+        raise ValueError("'page' doit être supérieur ou égal à 1")
+
+    if page_size < 1 or page_size > 100:
+        raise ValueError("'page_size' doit être compris entre 1 et 100 inclus")
+
+    offset = (page - 1) * page_size
+    end = offset + page_size
+
     return users[offset:end]
     
 @app.get("/users", response_model=UserListResponse)
@@ -116,10 +131,12 @@ def get_users(role: str | None = Query(default=None), search: str | None = Query
     filtered_users = filter_users_by_role(users, role)
     filtered_users = search_users(filtered_users, search)
 
+    # nombre total de ressources correspondant aux critères de recherche, avant pagination.
     total = len(filtered_users)
     
-    offset = (page - 1) * page_size
-    items = paginate_users(filtered_users, page_size, offset)
+    # nombre de ressources effectivement présentes dans la page courante
+    items = paginate_users(filtered_users, page, page_size)
+    
     
     total_pages = max(1, math.ceil(total / page_size))
     
