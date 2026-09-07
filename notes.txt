@@ -531,3 +531,76 @@ has_next = page < total_pages
 * has_previous
 has_previous = page > 1
 ------------------
+             USERS
+               │
+               ▼
+        ┌──────────────┐
+        │    FILTER    │
+        └──────┬───────┘
+               ▼
+        ┌──────────────┐
+        │    SEARCH    │
+        └──────┬───────┘
+               ▼
+             TOTAL
+               │
+               ▼
+        ┌──────────────┐
+        │  PAGINATION  │
+        └──────┬───────┘
+               ▼
+             ITEMS
+               │
+               ▼
+        METADATA
+        ├─ total_pages
+        ├─ has_previous
+        └─ has_next
+               │
+               ▼
+       UserListResponse
+----------
+1. routes
+Les routes sont la porte d'entrée HTTP.
+Elles s'occupent principalement de :
+
+recevoir la requête HTTP ;
+récupérer path, query, headers, body ;
+appeler la logique appropriée ;
+retourner la réponse.
+
+Une route ne devrait pas devenir un énorme bloc de logique métier.
+---
+2. schemas
+
+Les schemas définissent la forme des données qui entrent et sortent de l'API.
+Ils répondent essentiellement à :
+« Quelle forme de données mon API accepte-t-elle et expose-t-elle ? »
+---
+3. services
+C'est ici que nous allons mettre progressivement la logique métier.
+Le service répond à :
+« Qu'est-ce que l'application doit faire ? »
+---
+4. models
+
+Les models représentent généralement les données persistées, notamment les tables de la base de données lorsqu'on utilise SQLAlchemy.
+Le model répond davantage à :
+« Comment mes données sont-elles représentées et persistées ? »
+---
+app/
+│
+├── main.py
+│
+├── routes/
+│   └── users.py
+│
+├── schemas/
+│   └── user.py
+│
+├── services/
+│   └── user.py
+│
+└── models/
+    └── user.py
+--------
