@@ -121,7 +121,7 @@ def get_users(role: str | None = Query(default=None), search: str | None = Query
     offset = (page - 1) * page_size
     items = paginate_users(filtered_users, page_size, offset)
     
-    total_pages = math.ceil(total/page_size)
+    total_pages = max(1, math.ceil(total / page_size))
     
     has_next = page < total_pages
     has_previous = page > 1
