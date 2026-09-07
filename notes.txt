@@ -581,6 +581,7 @@ Ils répondent essentiellement à :
 C'est ici que nous allons mettre progressivement la logique métier.
 Le service répond à :
 « Qu'est-ce que l'application doit faire ? »
+Le service connaît le problème métier, mais pas le protocole utilisé pour exposer ce problème.
 ---
 4. models
 
@@ -603,4 +604,4 @@ app/
 │
 └── models/
     └── user.py
---------
+---------------

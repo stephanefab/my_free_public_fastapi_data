@@ -4,9 +4,7 @@ from datetime import datetime
 import datas
 from schemas.user import UserCreate, UserUpdate, UserPatch
 
-
-class UserNotFoundError(Exception):
-    pass
+from exceptions.user import UserNotFoundError
 
 
 def find_user(user_id: int):
