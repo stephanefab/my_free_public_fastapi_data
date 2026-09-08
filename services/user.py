@@ -4,7 +4,7 @@ from datetime import datetime
 import datas
 from schemas.user import UserCreate, UserUpdate, UserPatch
 
-from exceptions.user import UserNotFoundError
+from exceptions.user import UserNotFoundError, UserAlreadyExistsError
 
 
 def find_user(user_id: int):
@@ -14,6 +14,13 @@ def find_user(user_id: int):
 
     return None
 
+
+def email_already_exists(user_email: str):
+    for user in datas.users:
+        if user["email"] == user_email:
+            return user
+
+    return None
 
 def get_user(user_id: int):
     user = find_user(user_id)
@@ -129,6 +136,11 @@ def get_users(
 
 
 def create_user(user: UserCreate):
+    if email_already_exists(user.email):
+        raise UserAlreadyExistsError(
+            "Cette adresse email existe déjà"
+        )
+        
     now = datetime.now()
 
     new_user = {
