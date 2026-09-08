@@ -6,13 +6,7 @@ from schemas.user import UserCreate, UserUpdate, UserPatch
 
 from exceptions.user import UserNotFoundError, UserAlreadyExistsError
 
-
-def find_user(user_id: int):
-    for user in datas.users:
-        if user["id"] == user_id:
-            return user
-
-    return None
+from repositories import user as user_repository
 
 
 def find_user_by_email(user_email: str):
@@ -34,7 +28,7 @@ def find_user_by_username(user_username: str):
 
 
 def get_user(user_id: int):
-    user = find_user(user_id)
+    user = user_repository.find_by_id(user_id)
 
     if user is None:
         raise UserNotFoundError(
@@ -147,41 +141,22 @@ def get_users(
 
 
 def create_user(user: UserCreate):
-    existing_user = find_user_by_email(user.email)
+    existing_user = user_repository.find_by_email(user.email)
     if existing_user is not None:
         raise UserAlreadyExistsError(
             "Cette adresse email existe déjà",
             "USER_EMAIL_EXISTS"
         )
     
-    existing_user = find_user_by_username(user.username)
+    existing_user = user_repository.find_by_username(user.username)
     if existing_user is not None:
         raise UserAlreadyExistsError(
             "Cet username existe déjà",
             "USER_USERNAME_EXISTS"
         )
-        
-    now = datetime.now()
-
-    new_user = {
-        "id": datas.next_user_id,
-        "username": user.username,
-        "email": user.email,
-
-        # Temporaire pour notre exercice.
-        # Plus tard : véritable password hashing.
-        "password_hash": user.password + " HASHED",
-
-        "role": "user",
-        "is_active": True,
-        "created_at": now,
-        "updated_at": now,
-    }
-
-    datas.users.append(new_user)
-
-    datas.next_user_id += 1
-
+    
+    hashed_password = user.password + "@@#HASHED@@#__h45h3d"
+    new_user = user_repository.create(email=user.email, username=user.username, password_hash=hashed_password, role="user", is_active=False) 
     return new_user
 
 
@@ -189,7 +164,7 @@ def update_user(
     user_update: UserUpdate,
     user_id: int
 ):
-    user = find_user(user_id)
+    user = user_repository.find_by_id(user_id)
 
     if user is None:
         raise UserNotFoundError(
@@ -213,7 +188,7 @@ def patch_user(
     user_patch: UserPatch,
     user_id: int
 ):
-    user = find_user(user_id)
+    user = user_repository.find_by_id(user_id)
 
     if user is None:
         raise UserNotFoundError(
@@ -241,7 +216,7 @@ def patch_user(
 
 
 def delete_user(user_id: int):
-    user = find_user(user_id)
+    user = user_repository.find_by_id(user_id)
 
     if user is None:
         raise UserNotFoundError(

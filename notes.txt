@@ -625,3 +625,17 @@ Le service déclenche l'exception métier. Le handler intercepte cette exception
 -----------------------------------------
 Une couche doit connaître ce dont elle a besoin, mais éviter de connaître les détails internes des couches inférieures.
 ----------------------------------------
+Route → comprend HTTP.
+Schema → définit la forme et valide les données.
+Service → décide ce que l'application doit faire.
+Repository → sait comment lire/écrire les données.
+PostgreSQL → stocke les données.
+--------------------------------------
+Service :
+QUOI faire ?
+
+Repository :
+COMMENT accéder aux données pour le faire ?
+----------------------------------------
+Isoler les détails de persistance afin que leur changement ait le moins d'impact possible sur le reste de l'application.
+--------------------------------
