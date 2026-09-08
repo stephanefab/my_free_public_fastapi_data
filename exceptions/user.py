@@ -1,7 +1,7 @@
 from .base import AppException
 
 class UserNotFoundError(AppException):
-    pass
+    status_code = 404
 
 class UserAlreadyExistsError(AppException):
-    pass
+    status_code = 409

@@ -15,12 +15,23 @@ def find_user(user_id: int):
     return None
 
 
-def email_already_exists(user_email: str):
+def find_user_by_email(user_email: str):
+    normalized_email = user_email.strip().lower()
     for user in datas.users:
-        if user["email"] == user_email:
+        if user["email"].strip().lower() == normalized_email:
             return user
 
     return None
+
+
+def find_user_by_username(user_username: str):
+    normalized_username = user_username.strip().lower()
+    for user in datas.users:
+        if user["username"].strip().lower() == normalized_username:
+            return user
+
+    return None
+
 
 def get_user(user_id: int):
     user = find_user(user_id)
@@ -136,9 +147,16 @@ def get_users(
 
 
 def create_user(user: UserCreate):
-    if email_already_exists(user.email):
+    existing_user = find_user_by_email(user.email)
+    if existing_user is not None:
         raise UserAlreadyExistsError(
             "Cette adresse email existe déjà"
+        )
+    
+    existing_user = find_user_by_username(user.username)
+    if existing_user is not None:
+        raise UserAlreadyExistsError(
+            "Cet username existe déjà"
         )
         
     now = datetime.now()

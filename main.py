@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 
 from routes.user import router as user_router
 
-from exceptions.user import UserNotFoundError, UserAlreadyExistsError
+from exceptions.base import AppException
 
 
 app = FastAPI(
@@ -11,18 +11,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-@app.exception_handler(UserNotFoundError)
+@app.exception_handler(AppException)
 async def user_not_found_handler(request, exc):
     return JSONResponse(
-        status_code=404,
-        content={"detail": str(exc)}
-    )
-
-@app.exception_handler(UserAlreadyExistsError)
-async def user_already_exists_handler(request, exc):
-    return JSONResponse(
-        status_code=409,
-        content={"detail": str(exc)}
+        status_code=exc.status_code,
+        content={"detail": exc.detail}
     )
 
 @app.exception_handler(Exception)
