@@ -607,3 +607,21 @@ app/
 ---------------
 Le service déclenche l'exception métier. Le handler intercepte cette exception et la transforme en réponse HTTP.
 ----------------
+* Le service peut coordonner les opérations ; la base de données doit garantir les contraintes d'intégrité qui doivent rester vraies même sous concurrence.
+* Une vérification dans le service améliore l'expérience et permet de produire une erreur métier précise, mais elle ne remplace pas une contrainte d'intégrité en base.
+----------------------
+                    main.py
+                       │
+              ┌────────┴────────┐
+              │                 │
+           Routes           Exception
+              │              Handlers
+              │
+              ▼
+          Services
+              │
+              ▼
+            Data
+-----------------------------------------
+Une couche doit connaître ce dont elle a besoin, mais éviter de connaître les détails internes des couches inférieures.
+----------------------------------------
