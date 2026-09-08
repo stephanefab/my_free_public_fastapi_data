@@ -54,15 +54,7 @@ def get_users(
     response_model=UserResponse
 )
 def get_user(user_id: int):
-
-    try:
-        return user_service.get_user(user_id)
-
-    except user_service.UserNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc)
-        )
+    return user_service.get_user(user_id)
 
 
 @router.post(
@@ -71,7 +63,6 @@ def get_user(user_id: int):
     status_code=status.HTTP_201_CREATED
 )
 def create_user(user: UserCreate):
-
     return user_service.create_user(user)
 
 
@@ -83,17 +74,9 @@ def update_user(
     user_id: int,
     user_update: UserUpdate
 ):
-
-    try:
-        return user_service.update_user(
+    return user_service.update_user(
             user_update,
             user_id
-        )
-
-    except user_service.UserNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc)
         )
 
 
@@ -105,18 +88,10 @@ def patch_user(
     user_id: int,
     user_patch: UserPatch
 ):
-
-    try:
-        return user_service.patch_user(
-            user_patch,
-            user_id
-        )
-
-    except user_service.UserNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc)
-        )
+    return user_service.patch_user(
+        user_patch,
+        user_id
+    )
 
 
 @router.delete(
@@ -124,12 +99,4 @@ def patch_user(
     status_code=status.HTTP_204_NO_CONTENT
 )
 def delete_user(user_id: int):
-
-    try:
-        user_service.delete_user(user_id)
-
-    except user_service.UserNotFoundError as exc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(exc)
-        )
+    user_service.delete_user(user_id)

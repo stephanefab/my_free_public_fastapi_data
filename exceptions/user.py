@@ -1,1 +1,2 @@
-from services.user import UserNotFoundError
+class UserNotFoundError(Exception):
+    pass
