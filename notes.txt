@@ -606,3 +606,4 @@ app/
     └── user.py
 ---------------
 Le service déclenche l'exception métier. Le handler intercepte cette exception et la transforme en réponse HTTP.
+----------------

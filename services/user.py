@@ -150,13 +150,15 @@ def create_user(user: UserCreate):
     existing_user = find_user_by_email(user.email)
     if existing_user is not None:
         raise UserAlreadyExistsError(
-            "Cette adresse email existe déjà"
+            "Cette adresse email existe déjà",
+            "USER_EMAIL_EXISTS"
         )
     
     existing_user = find_user_by_username(user.username)
     if existing_user is not None:
         raise UserAlreadyExistsError(
-            "Cet username existe déjà"
+            "Cet username existe déjà",
+            "USER_USERNAME_EXISTS"
         )
         
     now = datetime.now()

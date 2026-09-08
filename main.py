@@ -12,17 +12,17 @@ app = FastAPI(
 )
 
 @app.exception_handler(AppException)
-async def user_not_found_handler(request, exc):
+async def app_exception_handler(request, exc):
     return JSONResponse(
         status_code=exc.status_code,
-        content={"detail": exc.detail}
+        content={"detail": exc.detail, "code": exc.code}
     )
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request, exc):
     return JSONResponse(
         status_code=500,
-        content={"detail": "Internal server error"}
+        content={"detail": "Internal server error", "code": "SERVER_ERROR"}
     )
 
 app.include_router(user_router)
